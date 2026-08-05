@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dekhoo - Live TV & Sports Hub</title>
+    <!-- আপডেট করা ফেভিকন লিংক -->
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/6z7gmt.png">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .header-wrapper {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .dekhoo-link {
+            display: inline-block;
+            width: fit-content;
+            cursor: pointer;
+            text-decoration: none;
+            align-self: flex-start;
+        }
+        h1 {
+            color: #ff4757;
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+        .subtitle {
+            color: #f1f2f6;
+            width: 100%;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+            pointer-events: none;
+        }
+        /* ক্যাটাগরি অপশন ট্য্যাব স্টাইল */
+        .category-nav {
+            display: flex;
+            gap: 10px;
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .cat-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .cat-btn:hover, .cat-btn.active {
+            background: #ff4757;
+            border-color: #ff4757;
+        }
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+        }
+        .player-section {
+            flex: 2;
+            min-width: 300px;
+        }
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        #overlay-msg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+        }
+        #current-playing {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #2ed573;
+            font-weight: bold;
+        }
+        .sidebar {
+            flex: 1;
+            min-width: 280px;
+            background: #161b22;
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            background: #0d1117;
+            color: #ffffff;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+        .others-btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 8px;
+            border: none;
+            background: #ff4757;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: 0.2s;
+        }
+        .others-btn:hover {
+            background: #ff6b81;
+        }
+        .channel-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .channel-item {
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: #21262d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .channel-item:hover {
+            background: #30363d;
+            color: #ff4757;
+        }
+        #status {
+            margin-top: 10px;
+            color: #f39c12;
+            font-size: 13px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            color: #8b949e;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            border-top: 1px solid #21262d;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dekhoo বাম কোণায় এবং Live TV & Sports Hub মাঝখানে সেট করা হয়েছে -->
+    <div class="header-wrapper">
+        <header>
+            <div class="dekhoo-link" onclick="goHome()">
+                <h1>Dekhoo</h1>
+            </div>
+            <div class="subtitle">Live TV & Sports Hub</div>
+        </header>
+    </div>
+
+    <!-- ক্যাটাগরি ন্যাভবার -->
+    <div class="category-nav">
+        <button class="cat-btn active" id="homeBtn" onclick="event.stopPropagation(); filterCategory('home', this)">Home</button>
+        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('news', this)">News</button>
+        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('sports', this)">Sports</button>
+        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('entertainment', this)">Entertainment</button>
+        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('cartoon', this)">Cartoon</button>
+    </div>
+
+    <div class="main-container">
+        <!-- ভিডিও প্লেয়ার সেকশন -->
+        <div class="player-section">
+            <div class="video-container">
+                <div id="overlay-msg">Please select a channel</div>
+                <video id="player" controls autoplay></video>
+            </div>
+            <div id="current-playing">No channel selected</div>
+            <div id="status">Loading channels...</div>
+        </div>
+
+        <!-- চ্যানেল লিস্ট, সার্চ ও আদার্স বাটন সেকশন -->
+        <div class="sidebar">
+            <input type="text" id="searchBox" class="search-box" placeholder="Search any channel..." onkeyup="filterChannels()">
+            <button id="othersBtn" class="others-btn" onclick="toggleOthers()">Load Others (Global Channels)</button>
+            <div class="channel-list" id="channelList"></div>
+        </div>
+    </div>
+
+    <footer>
+        Powered By MUKAMUMUN LIMITED
+    </footer>
+
+    <script>
+        const video = document.getElementById('player');
+        const channelListDiv = document.getElementById('channelList');
+        const statusDiv = document.getElementById('status');
+        const currentPlayingDiv = document.getElementById('current-playing');
+        const searchBox = document.getElementById('searchBox');
+        const othersBtn = document.getElementById('othersBtn');
+        const overlayMsg = document.getElementById('overlay-msg');
+        const homeBtn = document.getElementById('homeBtn');
+
+        const bdPlaylistUrl = 'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/bd.m3u';
+        const globalPlaylistUrl = 'https://iptv-org.github.io/iptv/index.m3u';
+
+        let bdChannels = [];
+        let globalChannels = [];
+        let showGlobal = false;
+        let currentCategory = 'home';
+        let hlsInstance = null;
+        let isGlobalLoading = false;
+        let loadTimeout = null;
+
+        function goHome() {
+            searchBox.value = '';
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            homeBtn.classList.add('active');
+            filterCategory('home', homeBtn);
+        }
+
+        async function parsePlaylist(url) {
+            try {
+                const response = await fetch(url);
+                const data = await response.text();
+                const lines = data.split('\n');
+                let list = [];
+                let currentName = '';
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (line.startsWith('#EXTINF:')) {
+                        let parts = line.split(',');
+                        if (parts.length > 1) {
+                            currentName = parts[parts.length - 1].trim();
+                        }
+                    } else if (line.startsWith('http')) {
+                        if (currentName) {
+                            if (!currentName.toLowerCase().includes('[geo-blocked]')) {
+                                list.push({ name: currentName, url: line });
+                            }
+                            currentName = '';
+                        }
+                    }
+                }
+                return list;
+            } catch (err) {
+                console.error("Playlist parse error:", err);
+                return [];
+            }
+        }
+
+        async function loadAllData() {
+            statusDiv.innerText = "Loading BD channels...";
+            bdChannels = await parsePlaylist(bdPlaylistUrl);
+            bdChannels.sort((a, b) => a.name.localeCompare(b.name));
+            applyCurrentView();
+            statusDiv.innerText = `Loaded ${bdChannels.length} BD channels.`;
+        }
+
+        async function toggleOthers() {
+            if (!showGlobal) {
+                if (globalChannels.length === 0) {
+                    othersBtn.innerText = "Loading Global Channels...";
+                    isGlobalLoading = true;
+                    let fetchedGlobal = await parsePlaylist(globalPlaylistUrl);
+                    globalChannels = fetchedGlobal.sort((a, b) => a.name.localeCompare(b.name));
+                    showGlobal = true;
+                    othersBtn.innerText = "Show Only BD Channels";
+                    isGlobalLoading = false;
+                    applyCurrentView();
+                    statusDiv.innerText = `Loaded total ${bdChannels.length + globalChannels.length} channels.`;
+                } else {
+                    showGlobal = true;
+                    othersBtn.innerText = "Show Only BD Channels";
+                    applyCurrentView();
+                    statusDiv.innerText = `Loaded total ${bdChannels.length + globalChannels.length} channels.`;
+                }
+            } else {
+                showGlobal = false;
+                othersBtn.innerText = "Load Others (Global Channels)";
+                applyCurrentView();
+                statusDiv.innerText = `Loaded ${bdChannels.length} BD channels.`;
+            }
+        }
+
+        function filterCategory(category, btnElement) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            applyCurrentView();
+        }
+
+        function getActiveSourceList() {
+            let baseList = showGlobal ? [...bdChannels, ...globalChannels].sort((a, b) => a.name.localeCompare(b.name)) : bdChannels;
+            
+            if (currentCategory === 'news') {
+                return baseList.filter(c => {
+                    let n = c.name.toLowerCase();
+                    return n.includes('news') || n.includes('somoy') || n.includes('independant') || n.includes('jamuna') || n.includes('24') || n.includes('bbc') || n.includes('cnn') || n.includes('reuters');
+                });
+            } else if (currentCategory === 'sports') {
+                return baseList.filter(c => {
+                    let n = c.name.toLowerCase();
+                    return n.includes('sport') || n.includes('cricket') || n.includes('football') || n.includes('t sports') || n.includes('ten') || n.includes('espn') || n.includes('fox');
+                });
+            } else if (currentCategory === 'entertainment') {
+                return baseList.filter(c => {
+                    let n = c.name.toLowerCase();
+                    return n.includes('tv') || n.includes('movie') || n.includes('drama') || n.includes('entertainment') || n.includes('music') || n.includes('show') || n.includes('bangla') || n.includes('hbo') || n.includes('star');
+                });
+            } else if (currentCategory === 'cartoon') {
+                return baseList.filter(c => {
+                    let n = c.name.toLowerCase();
+                    return n.includes('cartoon') || n.includes('kids') || n.includes('disney') || n.includes('nick') || n.includes('pogo') || n.includes('anime');
+                });
+            }
+            return baseList; // Home
+        }
+
+        function displayChannels(list) {
+            channelListDiv.innerHTML = '';
+            const displayList = list.slice(0, 500);
+            
+            if (displayList.length === 0) {
+                channelListDiv.innerHTML = '<div style="text-align:center; color:#8b949e; padding:15px;">No channels found in this category.</div>';
+                return;
+            }
+
+            displayList.forEach(channel => {
+                let div = document.createElement('div');
+                div.className = 'channel-item';
+                div.innerText = channel.name;
+                div.onclick = () => playChannel(channel.url, channel.name);
+                channelListDiv.appendChild(div);
+            });
+
+            if(list.length > 500 && searchBox.value.trim() === "") {
+                let infoDiv = document.createElement('div');
+                infoDiv.style.textAlign = "center";
+                infoDiv.style.color = "#8b949e";
+                infoDiv.style.fontSize = "12px";
+                infoDiv.style.padding = "8px";
+                infoDiv.innerText = `Showing first 500 of ${list.length}. Use search to find more.`;
+                channelListDiv.appendChild(infoDiv);
+            }
+        }
+
+        async function filterChannels() {
+            let query = searchBox.value.toLowerCase();
+            
+            if (query.trim() !== "") {
+                if (globalChannels.length === 0 && !isGlobalLoading && showGlobal) {
+                    isGlobalLoading = true;
+                    statusDiv.innerText = "Searching global channels...";
+                    let fetchedGlobal = await parsePlaylist(globalPlaylistUrl);
+                    globalChannels = fetchedGlobal.sort((a, b) => a.name.localeCompare(b.name));
+                    isGlobalLoading = false;
+                    statusDiv.innerText = `Ready. Total ${bdChannels.length + globalChannels.length} channels.`;
+                }
+
+                let sourceList = getActiveSourceList();
+                let filtered = sourceList.filter(c => c.name.toLowerCase().includes(query));
+                displayChannels(filtered);
+            } else {
+                applyCurrentView();
+            }
+        }
+
+        function applyCurrentView() {
+            let list = getActiveSourceList();
+            displayChannels(list);
+        }
+
+        loadAllData();
+
+        function playChannel(url, name) {
+            currentPlayingDiv.innerText = "Playing: " + name;
+            
+            overlayMsg.innerText = "Loading...";
+            overlayMsg.style.display = 'flex';
+
+            if (loadTimeout) clearTimeout(loadTimeout);
+
+            loadTimeout = setTimeout(() => {
+                if (overlayMsg.style.display === 'flex' && overlayMsg.innerText === "Loading...") {
+                    overlayMsg.innerText = "Unavailable";
+                }
+            }, 10000);
+
+            if (hlsInstance) {
+                hlsInstance.destroy();
+            }
+
+            if (Hls.isSupported()) {
+                hlsInstance = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90,
+                    maxBufferLength: 30,
+                    liveSyncDurationCount: 3
+                });
+                
+                hlsInstance.loadSource(url);
+                hlsInstance.attachMedia(video);
+                
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                    if (loadTimeout) clearTimeout(loadTimeout);
+                    overlayMsg.style.display = 'none';
+                    video.play().catch(e => console.log("Autoplay blocked"));
+                });
+
+                hlsInstance.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        if (loadTimeout) clearTimeout(loadTimeout);
+                        overlayMsg.innerText = "Unavailable";
+                        overlayMsg.style.display = 'flex';
+                    }
+                });
+
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.addEventListener('loadedmetadata', function() {
+                    if (loadTimeout) clearTimeout(loadTimeout);
+                    overlayMsg.style.display = 'none';
+                    video.play();
+                });
+                video.addEventListener('error', function() {
+                    if (loadTimeout) clearTimeout(loadTimeout);
+                    overlayMsg.innerText = "Unavailable";
+                    overlayMsg.style.display = 'flex';
+                });
+            }
+        }
+    </script>
+</body>
+</html>
