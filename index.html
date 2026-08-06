@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dekhoo - Live TV & Sports Hub</title>
-    <!-- আপডেট করা ফেভিকন লিংক -->
     <link rel="icon" type="image/png" href="https://files.catbox.moe/6z7gmt.png">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
@@ -21,21 +20,21 @@
         }
         .header-wrapper {
             max-width: 1200px;
-            margin: 0 auto 20px auto;
+            margin: 0 auto;
             width: 100%;
-            position: relative;
             display: flex;
             flex-direction: column;
         }
         header {
             width: 100%;
-            position: relative;
             display: flex;
             flex-direction: column;
+            margin-top: 0px; 
+            margin-bottom: 25px; /* হোম বাটন থেকে দূরত্ব বাড়ানোর জন্য মার্জিন সামান্য বাড়ানো হলো */
+            position: relative;
         }
         .dekhoo-link {
             display: inline-block;
-            width: fit-content;
             cursor: pointer;
             text-decoration: none;
             align-self: flex-start;
@@ -43,22 +42,22 @@
         h1 {
             color: #ff4757;
             font-size: 3.2rem;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: 1px;
+            font-weight: 900;
+            margin: 0px;
+            letter-spacing: 1.5px;
             text-align: left;
         }
         .subtitle {
             color: #f1f2f6;
             width: 100%;
             text-align: center;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-top: 5px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: -38px;
+            margin-bottom: 0;
             pointer-events: none;
         }
-        /* ক্যাটাগরি অপশন ট্য্যাব স্টাইল */
         .category-nav {
             display: flex;
             gap: 10px;
@@ -158,22 +157,6 @@
             margin-bottom: 12px;
             box-sizing: border-box;
         }
-        .others-btn {
-            width: 100%;
-            padding: 11px;
-            border-radius: 8px;
-            border: none;
-            background: #ff4757;
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: 0.2s;
-        }
-        .others-btn:hover {
-            background: #ff6b81;
-        }
         .channel-list {
             overflow-y: auto;
             flex-grow: 1;
@@ -185,13 +168,35 @@
             border-radius: 6px;
             cursor: pointer;
             transition: 0.2s;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .channel-item:hover {
             background: #30363d;
             color: #ff4757;
+        }
+        .channel-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 10px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+            background: #8b949e;
+        }
+        .status-dot.green {
+            background: #2ed573;
+            box-shadow: 0 0 6px #2ed573;
+        }
+        .status-dot.red {
+            background: #ff4757;
+            box-shadow: 0 0 6px #ff4757;
         }
         #status {
             margin-top: 10px;
@@ -206,12 +211,12 @@
             letter-spacing: 0.5px;
             border-top: 1px solid #21262d;
             margin-top: 30px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- Dekhoo বাম কোণায় এবং Live TV & Sports Hub মাঝখানে সেট করা হয়েছে -->
     <div class="header-wrapper">
         <header>
             <div class="dekhoo-link" onclick="goHome()">
@@ -223,15 +228,15 @@
 
     <!-- ক্যাটাগরি ন্যাভবার -->
     <div class="category-nav">
-        <button class="cat-btn active" id="homeBtn" onclick="event.stopPropagation(); filterCategory('home', this)">Home</button>
-        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('news', this)">News</button>
-        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('sports', this)">Sports</button>
-        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('entertainment', this)">Entertainment</button>
-        <button class="cat-btn" onclick="event.stopPropagation(); filterCategory('cartoon', this)">Cartoon</button>
+        <button class="cat-btn active" id="homeBtn" onclick="filterCategory('home', this)">Home</button>
+        <button class="cat-btn" onclick="filterCategory('news', this)">News</button>
+        <button class="cat-btn" onclick="filterCategory('sports', this)">Sports</button>
+        <button class="cat-btn" onclick="filterCategory('entertainment', this)">Entertainment</button>
+        <button class="cat-btn" onclick="filterCategory('cartoon', this)">Kids Zone</button>
     </div>
 
     <div class="main-container">
-        <!-- ভিডিও প্লেয়ার সেকশন -->
+        <!-- ভিডিও প্লেয়ার সেকশন -->
         <div class="player-section">
             <div class="video-container">
                 <div id="overlay-msg">Please select a channel</div>
@@ -241,10 +246,9 @@
             <div id="status">Loading channels...</div>
         </div>
 
-        <!-- চ্যানেল লিস্ট, সার্চ ও আদার্স বাটন সেকশন -->
+        <!-- চ্যানেল লিস্ট ও সার্চ সেকশন -->
         <div class="sidebar">
-            <input type="text" id="searchBox" class="search-box" placeholder="Search any channel..." onkeyup="filterChannels()">
-            <button id="othersBtn" class="others-btn" onclick="toggleOthers()">Load Others (Global Channels)</button>
+            <input type="text" id="searchBox" class="search-box" placeholder="Search any channel..." onkeyup="applyCurrentView()">
             <div class="channel-list" id="channelList"></div>
         </div>
     </div>
@@ -259,19 +263,14 @@
         const statusDiv = document.getElementById('status');
         const currentPlayingDiv = document.getElementById('current-playing');
         const searchBox = document.getElementById('searchBox');
-        const othersBtn = document.getElementById('othersBtn');
         const overlayMsg = document.getElementById('overlay-msg');
         const homeBtn = document.getElementById('homeBtn');
 
-        const bdPlaylistUrl = 'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/bd.m3u';
-        const globalPlaylistUrl = 'https://iptv-org.github.io/iptv/index.m3u';
+        const playlistUrl = 'https://iptv-org.github.io/iptv/index.m3u';
 
-        let bdChannels = [];
-        let globalChannels = [];
-        let showGlobal = false;
+        let allChannels = [];
         let currentCategory = 'home';
         let hlsInstance = null;
-        let isGlobalLoading = false;
         let loadTimeout = null;
 
         function goHome() {
@@ -281,9 +280,10 @@
             filterCategory('home', homeBtn);
         }
 
-        async function parsePlaylist(url) {
+        async function loadAllData() {
+            statusDiv.innerText = "Loading channels from playlist...";
             try {
-                const response = await fetch(url);
+                const response = await fetch(playlistUrl);
                 const data = await response.text();
                 const lines = data.split('\n');
                 let list = [];
@@ -299,87 +299,114 @@
                     } else if (line.startsWith('http')) {
                         if (currentName) {
                             if (!currentName.toLowerCase().includes('[geo-blocked]')) {
-                                list.push({ name: currentName, url: line });
+                                list.push({ name: currentName, url: line, status: null });
                             }
                             currentName = '';
                         }
                     }
                 }
-                return list;
+
+                allChannels = list;
+                allChannels.sort((a, b) => a.name.localeCompare(b.name));
+                
+                applyCurrentView();
+                statusDiv.innerText = `Loaded ${allChannels.length} channels. Checking status...`;
+                
+                checkAllChannelsInBackground();
+
             } catch (err) {
                 console.error("Playlist parse error:", err);
-                return [];
+                statusDiv.innerText = "Failed to load channels.";
             }
         }
 
-        async function loadAllData() {
-            statusDiv.innerText = "Loading BD channels...";
-            bdChannels = await parsePlaylist(bdPlaylistUrl);
-            bdChannels.sort((a, b) => a.name.localeCompare(b.name));
-            applyCurrentView();
-            statusDiv.innerText = `Loaded ${bdChannels.length} BD channels.`;
-        }
+        async function checkAllChannelsInBackground() {
+            const batchSize = 10;
+            let checkedCount = 0;
 
-        async function toggleOthers() {
-            if (!showGlobal) {
-                if (globalChannels.length === 0) {
-                    othersBtn.innerText = "Loading Global Channels...";
-                    isGlobalLoading = true;
-                    let fetchedGlobal = await parsePlaylist(globalPlaylistUrl);
-                    globalChannels = fetchedGlobal.sort((a, b) => a.name.localeCompare(b.name));
-                    showGlobal = true;
-                    othersBtn.innerText = "Show Only BD Channels";
-                    isGlobalLoading = false;
-                    applyCurrentView();
-                    statusDiv.innerText = `Loaded total ${bdChannels.length + globalChannels.length} channels.`;
-                } else {
-                    showGlobal = true;
-                    othersBtn.innerText = "Show Only BD Channels";
-                    applyCurrentView();
-                    statusDiv.innerText = `Loaded total ${bdChannels.length + globalChannels.length} channels.`;
+            for (let i = 0; i < allChannels.length; i += batchSize) {
+                let batch = allChannels.slice(i, i + batchSize);
+                
+                await Promise.all(batch.map(async (channel) => {
+                    if (channel.status !== null) return;
+                    try {
+                        let controller = new AbortController();
+                        let timeoutId = setTimeout(() => controller.abort(), 4000);
+                        
+                        await fetch(channel.url, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+                        clearTimeout(timeoutId);
+                        channel.status = true;
+                    } catch (e) {
+                        channel.status = false;
+                    }
+                    checkedCount++;
+                }));
+
+                updateVisibleDots();
+                
+                if (checkedCount >= 500) {
+                    break;
                 }
-            } else {
-                showGlobal = false;
-                othersBtn.innerText = "Load Others (Global Channels)";
-                applyCurrentView();
-                statusDiv.innerText = `Loaded ${bdChannels.length} BD channels.`;
             }
+            statusDiv.innerText = `Loaded total ${allChannels.length} channels.`;
+        }
+
+        function updateVisibleDots() {
+            let items = channelListDiv.querySelectorAll('.channel-item');
+            let currentList = getFilteredList();
+            
+            items.forEach((item, index) => {
+                if (currentList[index]) {
+                    let dot = item.querySelector('.status-dot');
+                    if (dot) {
+                        if (currentList[index].status === true) {
+                            dot.className = 'status-dot green';
+                        } else if (currentList[index].status === false) {
+                            dot.className = 'status-dot red';
+                        }
+                    }
+                }
+            });
         }
 
         function filterCategory(category, btnElement) {
             currentCategory = category;
-            
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
-
             applyCurrentView();
         }
 
-        function getActiveSourceList() {
-            let baseList = showGlobal ? [...bdChannels, ...globalChannels].sort((a, b) => a.name.localeCompare(b.name)) : bdChannels;
-            
+        function getFilteredList() {
+            let list = allChannels;
+
             if (currentCategory === 'news') {
-                return baseList.filter(c => {
+                list = list.filter(c => {
                     let n = c.name.toLowerCase();
                     return n.includes('news') || n.includes('somoy') || n.includes('independant') || n.includes('jamuna') || n.includes('24') || n.includes('bbc') || n.includes('cnn') || n.includes('reuters');
                 });
             } else if (currentCategory === 'sports') {
-                return baseList.filter(c => {
+                list = list.filter(c => {
                     let n = c.name.toLowerCase();
                     return n.includes('sport') || n.includes('cricket') || n.includes('football') || n.includes('t sports') || n.includes('ten') || n.includes('espn') || n.includes('fox');
                 });
             } else if (currentCategory === 'entertainment') {
-                return baseList.filter(c => {
+                list = list.filter(c => {
                     let n = c.name.toLowerCase();
                     return n.includes('tv') || n.includes('movie') || n.includes('drama') || n.includes('entertainment') || n.includes('music') || n.includes('show') || n.includes('bangla') || n.includes('hbo') || n.includes('star');
                 });
             } else if (currentCategory === 'cartoon') {
-                return baseList.filter(c => {
+                list = list.filter(c => {
                     let n = c.name.toLowerCase();
                     return n.includes('cartoon') || n.includes('kids') || n.includes('disney') || n.includes('nick') || n.includes('pogo') || n.includes('anime');
                 });
             }
-            return baseList; // Home
+
+            let query = searchBox.value.toLowerCase().trim();
+            if (query !== '') {
+                list = list.filter(c => c.name.toLowerCase().includes(query));
+            }
+
+            return list;
         }
 
         function displayChannels(list) {
@@ -387,19 +414,28 @@
             const displayList = list.slice(0, 500);
             
             if (displayList.length === 0) {
-                channelListDiv.innerHTML = '<div style="text-align:center; color:#8b949e; padding:15px;">No channels found in this category.</div>';
+                channelListDiv.innerHTML = '<div style="text-align:center; color:#8b949e; padding:15px;">No channels found.</div>';
                 return;
             }
 
             displayList.forEach(channel => {
                 let div = document.createElement('div');
                 div.className = 'channel-item';
-                div.innerText = channel.name;
-                div.onclick = () => playChannel(channel.url, channel.name);
+                
+                let dotClass = 'status-dot';
+                if (channel.status === true) dotClass += ' green';
+                else if (channel.status === false) dotClass += ' red';
+
+                div.innerHTML = `
+                    <span class="channel-name" title="${channel.name}">${channel.name}</span>
+                    <span class="${dotClass}"></span>
+                `;
+                
+                div.onclick = () => playChannel(channel, div.querySelector('.status-dot'));
                 channelListDiv.appendChild(div);
             });
 
-            if(list.length > 500 && searchBox.value.trim() === "") {
+            if(list.length > 500) {
                 let infoDiv = document.createElement('div');
                 infoDiv.style.textAlign = "center";
                 infoDiv.style.color = "#8b949e";
@@ -410,36 +446,15 @@
             }
         }
 
-        async function filterChannels() {
-            let query = searchBox.value.toLowerCase();
-            
-            if (query.trim() !== "") {
-                if (globalChannels.length === 0 && !isGlobalLoading && showGlobal) {
-                    isGlobalLoading = true;
-                    statusDiv.innerText = "Searching global channels...";
-                    let fetchedGlobal = await parsePlaylist(globalPlaylistUrl);
-                    globalChannels = fetchedGlobal.sort((a, b) => a.name.localeCompare(b.name));
-                    isGlobalLoading = false;
-                    statusDiv.innerText = `Ready. Total ${bdChannels.length + globalChannels.length} channels.`;
-                }
-
-                let sourceList = getActiveSourceList();
-                let filtered = sourceList.filter(c => c.name.toLowerCase().includes(query));
-                displayChannels(filtered);
-            } else {
-                applyCurrentView();
-            }
-        }
-
         function applyCurrentView() {
-            let list = getActiveSourceList();
+            let list = getFilteredList();
             displayChannels(list);
         }
 
         loadAllData();
 
-        function playChannel(url, name) {
-            currentPlayingDiv.innerText = "Playing: " + name;
+        function playChannel(channel, dotElement) {
+            currentPlayingDiv.innerText = "Playing: " + channel.name;
             
             overlayMsg.innerText = "Loading...";
             overlayMsg.style.display = 'flex';
@@ -449,8 +464,10 @@
             loadTimeout = setTimeout(() => {
                 if (overlayMsg.style.display === 'flex' && overlayMsg.innerText === "Loading...") {
                     overlayMsg.innerText = "Unavailable";
+                    channel.status = false;
+                    if (dotElement) dotElement.className = 'status-dot red';
                 }
-            }, 10000);
+            }, 8000);
 
             if (hlsInstance) {
                 hlsInstance.destroy();
@@ -465,12 +482,14 @@
                     liveSyncDurationCount: 3
                 });
                 
-                hlsInstance.loadSource(url);
+                hlsInstance.loadSource(channel.url);
                 hlsInstance.attachMedia(video);
                 
                 hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
                     if (loadTimeout) clearTimeout(loadTimeout);
                     overlayMsg.style.display = 'none';
+                    channel.status = true;
+                    if (dotElement) dotElement.className = 'status-dot green';
                     video.play().catch(e => console.log("Autoplay blocked"));
                 });
 
@@ -479,20 +498,26 @@
                         if (loadTimeout) clearTimeout(loadTimeout);
                         overlayMsg.innerText = "Unavailable";
                         overlayMsg.style.display = 'flex';
+                        channel.status = false;
+                        if (dotElement) dotElement.className = 'status-dot red';
                     }
                 });
 
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
+                video.src = channel.url;
                 video.addEventListener('loadedmetadata', function() {
                     if (loadTimeout) clearTimeout(loadTimeout);
                     overlayMsg.style.display = 'none';
+                    channel.status = true;
+                    if (dotElement) dotElement.className = 'status-dot green';
                     video.play();
                 });
                 video.addEventListener('error', function() {
                     if (loadTimeout) clearTimeout(loadTimeout);
                     overlayMsg.innerText = "Unavailable";
                     overlayMsg.style.display = 'flex';
+                    channel.status = false;
+                    if (dotElement) dotElement.className = 'status-dot red';
                 });
             }
         }
