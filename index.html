@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function () {
+        try {
+          var _fetch = window.fetch ? window.fetch.bind(window) : undefined;
+          Object.defineProperty(window, 'fetch', {
+            get: function () {
+              return _fetch;
+            },
+            set: function (val) {
+              _fetch = val;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        } catch (e) {
+          try {
+            if (window.Window && window.Window.prototype) {
+              var _pFetch = window.Window.prototype.fetch;
+              Object.defineProperty(window.Window.prototype, 'fetch', {
+                get: function () {
+                  return _pFetch;
+                },
+                set: function (val) {
+                  _pFetch = val;
+                },
+                configurable: true,
+                enumerable: true,
+              });
+            }
+          } catch (_) {}
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Dekhoo - Live TV & Sports Hub</title>
+    <meta name="description" content="Live TV and sports streaming hub with categories, channel search, and HLS video player." />
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/6z7gmt.png" />
+    <meta property="og:title" content="Dekhoo - Live TV & Sports Hub" />
+    <meta property="og:description" content="Live TV and sports streaming hub with categories, channel search, and HLS video player." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body class="bg-[#0d1117] text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

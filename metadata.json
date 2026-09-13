@@ -1,0 +1,6 @@
+{
+  "name": "Dekhoo - Live TV & Sports Hub",
+  "description": "Live TV and sports streaming hub with categories, channel search, and HLS video player.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
