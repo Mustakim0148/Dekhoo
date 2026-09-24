@@ -1,13 +1,10 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Social Bar Code 1 -->
+    <!-- Social Bar Code -->
     <script src="https://pl31493718.profitableratecpmnetwork.com/b6/f6/4a/b6f64aa5be55fb326de886ef51bd9821.js"></script>
 
-    <!-- Social Bar Code 2 (আপনার দেওয়া প্রথম সোশ্যাল বার কোডটি এখানে দ্বিতীয়বার ডুপ্লিকেট করে দেওয়া হয়েছে, চাইলে আপনার অন্য কোনো সোশ্যাল বার কোড এখানে বসাতে পারেন) -->
-    <script src="https://pl31493718.profitableratecpmnetwork.com/b6/f6/4a/b6f64aa5be55fb326de886ef51bd9821.js"></script>
-
-    <!-- Popunder Code (ক্লিক করলে অন্য পেজে নিয়ে যাওয়ার অ্যাড) -->
+    <!-- Popunder Code -->
     <script src="https://pl31494165.profitableratecpmnetwork.com/9f/2d/8a/9f2d8aa49aceaa138d0d31a00d7388d7.js"></script>
 
     <script>
@@ -64,6 +61,38 @@
   </head>
   <body class="bg-[#0d1117] text-white">
     <div id="root"></div>
+
+    <!-- Ad Blocker Detector Script -->
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const testAd = document.createElement('div');
+          testAd.innerHTML = '&nbsp;';
+          testAd.className = 'adsbox';
+          testAd.style.position = 'absolute';
+          testAd.style.left = '-999px';
+          document.body.appendChild(testAd);
+          
+          window.setTimeout(() => {
+            if (testAd.offsetHeight === 0) {
+              const warningBox = document.createElement('div');
+              warningBox.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999999; display: flex; justify-content: center; align-items: center; color: white; font-family: sans-serif; text-align: center; padding: 20px;">
+                  <div style="background: #1f2937; padding: 30px; border-radius: 12px; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                    <h2 style="color: #ff4757; margin-bottom: 15px;">Ad Blocker Detected!</h2>
+                    <p style="margin-bottom: 20px; color: #d1d5db;">Please turn off your ad blocker to watch Live TV and support our website.</p>
+                    <button onclick="location.reload()" style="background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">I have disabled it, Reload</button>
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(warningBox);
+            }
+            testAd.remove();
+          }, 100);
+        }, 1000);
+      });
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
